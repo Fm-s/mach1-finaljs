@@ -1,0 +1,42 @@
+.templates{
+    display: none;
+}
+
+.btn-pago-wrapper button, .btn-pendente-wrapper button {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-family: 'Roboto', sans-serif;
+    font-weight: 500;
+    font-size: 13px;
+    height: 30px;
+    box-shadow: 0px 3px 1px -2px rgba(0, 0, 0, 0.2), 0px 2px 2px rgba(0, 0, 0, 0.14), 0px 1px 5px rgba(0, 0, 0, 0.12);
+    border: 0;
+    cursor: pointer;
+    color: #fff;
+}
+
+.btn-pago-wrapper button {
+    background-color: #178D46;
+    width: 56px;
+}
+
+.btn-pago-wrapper button:hover{
+    background-color: #106532;
+}
+
+.btn-pago-wrapper button:active{
+    background-color: #1baf56;
+}
+
+.btn-pendente-wrapper button {
+    background-color: #FF0000;
+    width: 89px;
+}
+
+.btn-pendente-wrapper button:hover {
+    background-color: #d80000;
+}
+.btn-pendente-wrapper button:active{
+    background-color: #FF0000;
+}
