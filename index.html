@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Projeto Final JS</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header>
+        <div class="nav-container">
+            <a href="#despesas">Despesas</a>
+            <div class="divider"></div>
+            <a href="#categorias">Categorias</a>
+        </div>
+    </header>
+    <main>
+        <div id="despesas">
+            <div class="totals">
+                <div class="totals-box pago">
+                    <h4>TOTAL PAGO</h4>
+                    <p>R$</p>
+                </div>
+                <div class="totals-box apagar">
+                    <h4>TOTAL A PAGAR</h4>
+                    <p>R$</p>
+                </div>
+                <div class="totals-box atrasadas">
+                    <h4>ATRASADAS</h4>
+                    <p>R$</p>
+                </div> 
+            </div>
+        
+            <div class="lista-container">
+                <div class="caixa-filtro">
+                    <div class="form-control">
+                        <label for="texto-pesquisa">Filtro</label>
+                        <div class="input-wrapper">
+                            <input id="texto-pesquisa" type="text">
+                        </div>
+                    </div>
+                    <button type="button">Filtrar</button>
+                </div>
+                <table class="tabela-lista" id="tabela-contas">
+                    <thead>
+                        <tr>
+                            <th>Data Vencimento</th>
+                            <th>Despesa</th>
+                            <th>Valor</th>
+                            <th></div>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody class="tabela-lista__corpo" id="tabela-contas__corpo">
+                        <tr>
+                            <td>20/20/2020</td>
+                            <td>Dummy</td>
+                            <td>R$ 1.999,99</td>
+                            <td>Done</td>
+                        </tr>
+                        <tr>
+                            <td>20/20/2020</td>
+                            <td>Dummy</td>
+                            <td>R$ 1.999,99</td>
+                            <td>Done</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <div class="btn-wrapper">
+                    <button type="button">ADICIONAR DESPESA</button>
+                </div>
+            </div>
+        </div>
+        <div class="categorias">
+            <div class="title-wrapper">
+                <h4>CADASTRO DE CATEGORIAS</h4>
+            </div>
+            <div class="lista-container">
+                <div class="caixa-filtro">
+                    <div class="form-control">
+                        <label for="texto-pesquisa">Filtro</label>
+                        <div class="input-wrapper">
+                            <input id="texto-pesquisa" type="text">
+                        </div>
+                    </div>
+                    <button type="button">Filtrar</button>
+                </div>
+                <table class="tabela-lista" id="tabela-categorias">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Categoria</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody class="tabela-lista__corpo" id="tabela-categorias__corpo">
+                        <tr>
+                            <td>123456</td>
+                            <td>Dummy</td>
+                            <td>BTN1 BTN2</td>
+                        </tr>
+                        <tr>
+                            <td>123456</td>
+                            <td>Dummy</td>
+                            <td>BTN1 BTN2</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <div class="btn-wrapper">
+                    <button type="button">ADICIONAR CATEGORIA</button>
+                </div>
+            </div>
+        </div>
+    </main>
+    <div class="templates">
+        <div class="btn-pago-wrapper">
+            <button type="button">PAGO</button>
+        </div>
+        <div class="btn-pendente-wrapper">
+            <button type="button">PENDENTE</button>
+        </div>
+        <div class="modal__cad-categorias">
+            <div class="close-btn-wrapper">
+                <span>X</span>
+            </div>
+            <div class="modal__cad-categorias__content">
+            </div>
+        </div>
+    </div>
+</body>
+</html>
