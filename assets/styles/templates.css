@@ -1,8 +1,8 @@
 .templates{
-    display: none;
+    display: block  ;
 }
 
-.btn-pago-wrapper button, .btn-pendente-wrapper button {
+.template-btn button {
     display: flex;
     justify-content: center;
     align-items: center;
@@ -39,4 +39,31 @@
 }
 .btn-pendente-wrapper button:active{
     background-color: #FF0000;
+}
+
+.btn-edit-wrapper button {
+    width: 66px;
+    background-color: #2196f3;
+}
+
+.btn-edit-wrapper button:hover {
+    background-color: rgb(29, 137, 225);
+}
+
+.btn-edit-wrapper button:active{
+    background-color:  rgb(34, 152, 249);
+}
+
+.btn-delete-wrapper button{
+    color: #d32f2f;
+    background-color: transparent;
+    border: 1px solid rgba(211, 47, 47, 0.5);
+}
+
+.btn-delete-wrapper button:hover{
+    background-color: rgba(211, 47, 47, 0.5);
+}
+
+.btn-delete-wrapper button:active{
+    background-color: rgba(211, 47, 47, 0.3);;
 }
