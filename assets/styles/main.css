@@ -227,8 +227,16 @@ label[for="texto-pesquisa"]{
     margin-right: 9px;
 }
 
+#tabela-contas th:first-child {
+    width: 150px;
+}
+
+#tabela-categorias th:first-child {
+    width: 60px;
+}
+
 .tabela-lista th:last-child{
-    width: 250px;
+    width: 200px;
 }
 
 .tabela-lista__corpo td{

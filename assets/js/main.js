@@ -1,7 +1,11 @@
 const ID_PAGINAS = ['despesas','categorias'];
 
-const CATEGORIAS = [];
+const CATEGORIAS = ['Geral'];
 const DESPESAS = [];
+
+const updateTotals = () => {
+
+}
 
 const valueChangeHandler = ({target}) => {
     target.value = new Intl.NumberFormat('pt-BR', {
@@ -111,7 +115,7 @@ const validateDate = (dateStr) => {
 }
 
 const newExpense = (nodeArray) => {
-    const newExp = {};
+    const newExp = {pago: false};
     for(let aNode of nodeArray){
         switch(aNode.name){
             case 'categoria':
@@ -144,10 +148,59 @@ const newExpense = (nodeArray) => {
                 }
                 break;
         }
-
-    }
+    }    
     DESPESAS.push(newExp);
+    loadDespesas([...DESPESAS])
     return true;
+}
+
+const expenseStatus = (parent, button, control) => {
+    parent.removeChild(button);
+    control.pago = !control.pago;
+    button = document.querySelector(`.templates ${control.pago ? 'div.btn-pago-wrapper' : 'div.btn-pendente-wrapper'}`).cloneNode(true);
+    button.addEventListener('click',()=>{
+        expenseStatus(parent, button, control)
+    })
+    parent.appendChild(button);
+    updateTotals();
+}
+
+const loadDespesas = (despesas) => {
+    const tbody = document.getElementById('tabela-contas__corpo');
+    if(despesas.length > 0){
+        tbody.innerHTML = '';
+        despesas.forEach((el,index)=>{
+            const tRow = document.createElement('tr');
+            
+            const dataTd = document.createElement('td');
+            dataTd.innerText = el.date;
+            tRow.appendChild(dataTd);
+            
+            const catTd = document.createElement('td');
+            catTd.innerText = el.categoria;
+            tRow.appendChild(catTd);
+
+            const descTd = document.createElement('td');
+            descTd.innerText = el.descricao;
+            tRow.appendChild(descTd);
+
+            const valorTd = document.createElement('td');
+            valorTd.innerText = el.valor;
+            tRow.appendChild(valorTd);
+
+            const statusTd = document.createElement('td');
+            let actionButton = document.querySelector(`.templates ${el.pago ? 'div.btn-pago-wrapper' : 'div.btn-pendente-wrapper'}`).cloneNode(true);
+            actionButton.addEventListener('click',()=>{
+                expenseStatus (statusTd, actionButton, el);
+            })
+            statusTd.appendChild(actionButton);
+            tRow.appendChild(statusTd);
+
+            tbody.appendChild(tRow);
+        });
+    } else {
+        tbody.innerHTML = '<tr><td colspan="5">Não há despesas</td></tr>';  
+    }
 }
 
 const editCategory = (index)=>{
@@ -159,8 +212,11 @@ const deleteCategory = (index)=>{
 };
 
 const loadCategories = (categorias) => {
+
     const tbody = document.getElementById('tabela-categorias__corpo')
     tbody.innerHTML = '';
+
+    if(categorias.length > 0){
     categorias.forEach((el,index)=>{
             const tRow = document.createElement('tr');
             
@@ -194,6 +250,9 @@ const loadCategories = (categorias) => {
 
             tbody.appendChild(tRow);
         })
+    }else{
+        tbody.innerHTML = '<tr><td colspan="3">Não há categorias</td></tr>';
+    }
 }
 
 const modalDespesas = () => {
@@ -240,20 +299,9 @@ const pageLoad = () => {
         loadModal(modalDespesas(),newExpense)
     })
 
-    if(DESPESAS.length > 0){
+    loadDespesas([...DESPESAS]);
 
-    }else{
-        document.getElementById('tabela-contas__corpo')
-        .innerHTML = '<tr><td colspan="4">Não há despesas</td></tr>';
-    }
-
-    if(CATEGORIAS.length > 0){
-        loadCategories([...CATEGORIAS]);
-    }else{
-        document.getElementById('tabela-categorias__corpo')
-        .innerHTML = '<tr><td colspan="3">Não há categorias</td></tr>';
-    }
-    
+    loadCategories([...CATEGORIAS]);
 }
 
 window.addEventListener('load',pageLoad)
