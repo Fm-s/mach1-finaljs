@@ -204,7 +204,37 @@ const loadDespesas = (despesas) => {
 }
 
 const editCategory = (index)=>{
-    console.log('edit',index)
+    loadModal(
+        {
+            title: 'Editar Categoria',
+            nodes: [
+                inputGen("categoria","Categoria",
+                {
+                    placeholder: "Nome da Categoria",
+                    value: CATEGORIAS[index]
+                })
+            ]
+        },
+        (nodeArray)=>{
+            const categoryName = nodeArray[0].value;
+            if(CATEGORIAS.map(el=>el.toLowerCase()).includes(categoryName.toLowerCase())){
+                popAlert(`Categoria com nome: ${categoryName} já cadastrada`);
+                return false;
+            }else{
+                let changed = 0;
+                DESPESAS.forEach(el=>{
+                    if(el=>el.categoria === CATEGORIAS[index]){
+                        changed++;
+                        el.categoria = categoryName
+                    }
+                })
+                CATEGORIAS[index] = categoryName;
+                loadCategories([...CATEGORIAS]);
+                if(changed > 0) loadDespesas([...DESPESAS]);
+                popAlert('Categoria editada com sucesso!',true);
+                return true;
+            };
+        })
 };
 
 const deleteCategory = (index)=>{
