@@ -1,6 +1,10 @@
 @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap');
 @import url('/assets/styles/templates.css');
 
+:root{
+    --header-height: 60px;
+}
+
 html, body {
     margin: 0;
     background-color: #F3F6F9;
@@ -16,7 +20,7 @@ html, body {
 
 header{
     display: flex;
-    height: 60px;
+    height: var(--header-height);
     align-items: center;
     justify-content: flex-end;
     background-color: #0ACF83;
@@ -175,7 +179,7 @@ label[for="texto-pesquisa"]{
     width: 199px;
 }
 
-.categorias .btn-wrapper button {
+#categorias .btn-wrapper button {
     width: 216px;
 }
 
@@ -203,7 +207,6 @@ label[for="texto-pesquisa"]{
     background: #F3F6F9;
 }
 
-
 .tabela-lista th{
     font-family: 'Roboto', sans-serif;
     font-weight: 400;
@@ -224,12 +227,21 @@ label[for="texto-pesquisa"]{
     margin-right: 9px;
 }
 
+.tabela-lista th:last-child{
+    width: 250px;
+}
+
 .tabela-lista__corpo td{
     font-family: 'Roboto', sans-serif;
     font-weight: 400;
     font-size: 14px;
     padding: 8px 8px;
     border-top: 1px solid rgba(0, 0, 0, 0.10);
+}
+
+.tabela-lista__corpo td div{
+    display: flex;
+    gap: 15px;
 }
 
 .tabela-lista__corpo tr:nth-child(2n){
