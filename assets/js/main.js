@@ -3,15 +3,43 @@ const ID_PAGINAS = ['despesas','categorias'];
 const CATEGORIAS = ['Geral'];
 const DESPESAS = [];
 
-const updateTotals = () => {
+const stringToNumber = (value) => {
+     return value.replace(',','.').replace(/[^\d.]/g, '');
+}
 
+const numberFormatBR = (value) => {
+    if(typeof(value) === 'string'){
+        value = stringToNumber(value);
+    }
+    return new Intl.NumberFormat('pt-BR', {
+        style: 'currency',
+        currency: 'BRL',
+      }).format(value);
+}
+
+const updateTotals = () => {
+    
+    const totalPago = document.querySelector('.totals-box.pago p');
+    const totalAPagar = document.querySelector('.totals-box.apagar p');
+    const totalAtrasadas = document.querySelector('.totals-box.atrasadas p');
+    
+    totalPago.innerText = numberFormatBR(DESPESAS.filter(el=>el.pago)
+        .reduce((total,el)=>total += +stringToNumber(el.valor),0));
+            
+    totalAPagar.innerText = numberFormatBR(DESPESAS.filter(el=>!el.pago)
+        .reduce((total,el)=>total += +stringToNumber(el.valor),0));
+
+    totalAtrasadas.innerText = DESPESAS.filter(el=>{
+        const splitDate = el.date.split('/');
+        const today = new Date();
+        return !el.pago && (today.getFullYear() > +splitDate[2] || 
+            (today.getFullYear() === +splitDate[2] && today.getMonth()+1 > +splitDate[1] ||
+             (today.getFullYear() === +splitDate[2] && today.getMonth()+1 === +splitDate[1] && today.getDay() > splitDate[0])));
+    }).length;
 }
 
 const valueChangeHandler = ({target}) => {
-    target.value = new Intl.NumberFormat('pt-BR', {
-        style: 'currency',
-        currency: 'BRL',
-      }).format(target.value.replace(',','.').replace(/[^\d.]/g, ''));
+    target.value = numberFormatBR(target.value);
 }
 
 //Chat GPT
@@ -115,7 +143,7 @@ const newCategory = (nodeArray) => {
 }
 
 const validateDate = (dateStr) => {
-    return true;
+    return dateStr.length === 10;
 }
 
 const newExpense = (nodeArray) => {
@@ -154,7 +182,8 @@ const newExpense = (nodeArray) => {
         }
     }    
     DESPESAS.push(newExp);
-    loadDespesas([...DESPESAS])
+    loadDespesas([...DESPESAS]);
+    updateTotals();
     return true;
 }
 
@@ -353,6 +382,8 @@ const pageLoad = () => {
     loadDespesas([...DESPESAS]);
 
     loadCategories([...CATEGORIAS]);
+
+    updateTotals();
 }
 
 window.addEventListener('load',pageLoad)
