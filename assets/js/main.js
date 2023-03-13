@@ -50,6 +50,10 @@ const popAlert = (text,successes) => {
     document.body.appendChild(pAlert);
 }
 
+const popConfirm = (text,action) => {
+    confirm(text) && action();
+}
+
 const loadModal = (modalData,action)=>{
     const modal = document.querySelector('.templates div.template-modal').cloneNode(true);
     modal.querySelector(".title-wrapper h4").innerHTML = modalData.title;
@@ -238,7 +242,22 @@ const editCategory = (index)=>{
 };
 
 const deleteCategory = (index)=>{
-    console.log('delete',index);
+    if(index === 0){
+        popAlert("Não é possivel deletar a categoria principal!")
+    }else{
+        let changed = 0;
+        popConfirm("Confirma apagar Categoria? (essa ação não é reversivel!)",()=>{
+            DESPESAS.forEach(el=>{
+                if(el=>el.categoria === CATEGORIAS[index]){
+                    changed++;
+                    el.categoria = CATEGORIAS[0];
+                }
+            })
+            CATEGORIAS.splice(index,1);
+            loadCategories([...CATEGORIAS]);
+            if(changed > 0) loadDespesas([...DESPESAS]);
+        })
+    }
 };
 
 const loadCategories = (categorias) => {
@@ -270,11 +289,13 @@ const loadCategories = (categorias) => {
             });
             actionDiv.appendChild(editBtn);
 
-            deleteBtn = document.querySelector('.templates div.btn-delete-wrapper').cloneNode(true);
-            deleteBtn.addEventListener('click',()=>{
-                deleteCategory(index);
-            });
-            actionDiv.appendChild(deleteBtn)
+            if(index !== 0){
+                deleteBtn = document.querySelector('.templates div.btn-delete-wrapper').cloneNode(true);
+                deleteBtn.addEventListener('click',()=>{
+                    deleteCategory(index);
+                });
+                actionDiv.appendChild(deleteBtn)
+            }
 
             tRow.appendChild(actionTd);
 
