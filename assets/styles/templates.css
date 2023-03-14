@@ -153,7 +153,7 @@
     outline: 0;
 }
 
-.alert-box{
+.alert-box, .confirm-box{
     position: fixed;
     display: flex;
     justify-content: center;
@@ -167,12 +167,15 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-top: 50vh;
+    margin-top: 40vh;
     gap: 50px;
-    padding: 10px;
+    padding: 25px 20px;
     border: 1px solid black;
     height: 25px;
-    border-radius: 30px;
+    border-radius: 8px;
+    font-family: 'Roboto', sans-serif;
+    font-weight: 500;
+    font-size: 18px;
 }
 
 .alert-box__card.successes{
@@ -208,4 +211,69 @@
 .alert-box__card .close:active{
     border: 1px solid rgba(0, 0, 0, 0.1);
     background-color: rgba(0, 0, 0, 0.05);
+}
+
+.confirm-box__card{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    margin-top: 40vh;
+    padding: 25px 20px;
+    border: 1px solid black;
+    border-radius: 8px;
+    font-family: 'Roboto', sans-serif;
+    font-weight: 500;
+    font-size: 18px;
+    gap: 40px;
+    height: fit-content;
+    background-color: #fff;
+}
+
+.confirm-box__card__header{
+    font-family: 'Roboto', sans-serif;
+    font-weight: 500;
+    font-size: 18px;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+}
+
+.confirm-box__content{
+    font-size: 14px;
+}
+
+.confirm-box__control{
+    display: flex;
+    gap: 25px;
+}
+
+.confirm-box__control__btn{
+   width: 80px;
+   font-size: 18px;
+}
+
+.confirm-box__control__btn.yes{
+    background-color: #1baf56;
+}
+
+.confirm-box__control__btn.yes:hover{
+    background-color: #106532;
+}
+.confirm-box__control__btn.yes:active{
+    background-color: #178D46;
+}
+
+.confirm-box__control__btn.no{
+    background-color: #d80000;
+}
+
+.confirm-box__control__btn.no:hover{
+    background-color: #c01a1a;
+}
+
+.confirm-box__control__btn.no:active{
+    background-color: #FF0000;
 }

@@ -78,8 +78,19 @@ const popAlert = (text,successes) => {
     document.body.appendChild(pAlert);
 }
 
-const popConfirm = (text,action) => {
-    confirm(text) && action();
+const popConfirm = (text,action,title = '') => {
+    const cAltert = document.querySelector('.templates div.confirm-box').cloneNode(true);
+    cAltert.querySelector('.confirm-box__card__header__title').innerText = title;
+    cAltert.querySelector('.confirm-box__content').innerText = text;
+    cAltert.querySelector('button.confirm-box__control__btn.yes').addEventListener('click',()=>{
+        action();
+        cAltert.remove();
+    });
+
+    cAltert.querySelector('button.confirm-box__control__btn.no').addEventListener('click',()=>{
+        cAltert.remove();
+    });
+    document.body.appendChild(cAltert);
 }
 
 const loadModal = (modalData,action)=>{
@@ -317,7 +328,7 @@ const deleteCategory = (index)=>{
             CATEGORIAS.splice(index,1);
             loadCategories([...CATEGORIAS]);
             if(changed > 0) loadDespesas([...DESPESAS]);
-        })
+        },'Exclusão');
     }
 };
 
@@ -398,11 +409,13 @@ const modalDespesas = () => {
     }
 }
 
-const modalCategorias = {
-    title: "ADICIONAR CATEGORIA",
-    nodes: [
-        inputGen("categoria","Categoria",{placeholder: "Nome da Categoria"})
-    ]
+const modalCategorias = () => {
+    return {
+        title: "ADICIONAR CATEGORIA",
+        nodes: [
+            inputGen("categoria","Categoria",{placeholder: "Nome da Categoria"})
+        ]
+    }
 }
 
 const pageLoad = () => {
@@ -420,7 +433,7 @@ const pageLoad = () => {
     }
 
     document.querySelector('#categorias .btn-wrapper button').addEventListener('click',()=>{
-        loadModal(modalCategorias,newCategory)
+        loadModal(modalCategorias(),newCategory)
     })
     
     document.querySelector('#despesas .btn-wrapper button')?.addEventListener('click',()=>{
