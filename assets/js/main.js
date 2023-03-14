@@ -100,6 +100,38 @@ const loadModal = (modalData,action)=>{
     document.body.appendChild(modal);
 }
 
+const filterList = (searchId, sourceArray, action) => {
+    const words = document.querySelector(`#${searchId} .caixa-filtro input`).value.split(' ').map(el=>el.toLowerCase().trim()).filter(el=>el!=='');
+    if(words.length === 0) return false;
+    let filterFn;
+    if(searchId === 'despesas'){
+        filterFn = (el) => {
+            let match = 0;
+            for(let key in el){
+                for(let word of words){
+                    if(el[key].toString().toLowerCase().includes(word)){
+                        match++
+                    }
+                }
+            }
+            return match === words.length;
+        }
+    };
+    if(searchId === 'categorias'){
+        filterFn = (el) => {
+            let match = 0;
+            for(let word of words){
+                if(word === el.toLowerCase()){
+                    match++;
+                }
+            }
+            return match === words.length;
+        }
+    };
+    action(sourceArray.filter(filterFn));
+    return true;
+}
+
 const dataListGen = (id,source) => {
     datalist = document.createElement('datalist')
     datalist.id = id
@@ -335,6 +367,22 @@ const loadCategories = (categorias) => {
     }
 }
 
+const filterActionAttach = (containerId,sourceArray,action) => {
+    document.querySelector(`#${containerId} .caixa-filtro > button`).addEventListener('click',()=>{
+        if(filterList(containerId,sourceArray,action)){
+            document.querySelector(`#${containerId} .caixa-filtro .limparFiltroWrapper`).classList.add('show');
+        }else{
+            popAlert("Digite um valor para filtrar!");
+        };
+        
+    });
+    document.querySelector(`#${containerId} .caixa-filtro .limparFiltroWrapper button`).addEventListener('click',()=>{
+        action([...sourceArray]);
+        document.querySelector(`#${containerId} .caixa-filtro .limparFiltroWrapper`).classList.remove('show');
+        document.querySelector(`#${containerId} .caixa-filtro input`).value = "";
+    });
+}
+
 const modalDespesas = () => {
     return {title: "ADICIONAR DESPESA",
     nodes: [
@@ -382,6 +430,9 @@ const pageLoad = () => {
     loadDespesas([...DESPESAS]);
 
     loadCategories([...CATEGORIAS]);
+
+    filterActionAttach(ID_PAGINAS[0],DESPESAS,loadDespesas);
+    filterActionAttach(ID_PAGINAS[1],CATEGORIAS,loadCategories);
 
     updateTotals();
 }

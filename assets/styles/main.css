@@ -120,7 +120,29 @@ main{
 
 }
 
-.categorias .caixa-filtro{
+.caixa-filtro .limparFiltroWrapper{
+    display: none;
+    justify-content: flex-end;
+}
+
+.caixa-filtro .limparFiltroWrapper.show{
+    display: flex;
+}
+
+.caixa-filtro .limparFiltroWrapper button{
+    width: 130px;
+    background-color: #0ACF83;
+}
+
+.caixa-filtro .limparFiltroWrapper button:hover{
+    background-color: #08b170;
+}
+
+.caixa-filtro .limparFiltroWrapper button:active{
+    background-color: #0be692;
+}
+
+#categorias .caixa-filtro{
     margin-top: 60px;
 }
 
