@@ -1,10 +1,27 @@
 const ID_PAGINAS = ['despesas','categorias'];
 
-const CATEGORIAS = ['Geral'];
+const ID = {};
+const CATEGORIAS = [{
+    name: 'Geral',
+    id: uniqueId('cat')  
+}];
 const DESPESAS = [];
 
+
+function uniqueId(tag){
+    if(ID[tag]){
+        ID[tag].last = ID[tag].next;
+        ID[tag].next = ID[tag].next + 1;
+    }else{
+        ID[tag] = {};
+        ID[tag].last = 1;
+        ID[tag].next = 2;
+    }
+    return ID[tag].last;
+}
+
 const stringToNumber = (value) => {
-     return value.replace(',','.').replace(/[^\d.]/g, '');
+     return value.replace('.','').replace(',','.').replace(/[^\d.]/g, '');
 }
 
 const numberFormatBR = (value) => {
@@ -132,7 +149,7 @@ const filterList = (searchId, sourceArray, action) => {
         filterFn = (el) => {
             let match = 0;
             for(let word of words){
-                if(word === el.toLowerCase()){
+                if(word === el.name.toLowerCase()){
                     match++;
                 }
             }
@@ -148,7 +165,7 @@ const dataListGen = (id,source) => {
     datalist.id = id
     for(let el of source){
         const option = document.createElement('option');
-        option.value = el;
+        option.value = el.name;
         datalist.appendChild(option);
     }
     return datalist;
@@ -174,11 +191,12 @@ const inputGen = (label,name,extras) => {
 
 const newCategory = (nodeArray) => {
     const categoryName = nodeArray[0].value;
-            if(CATEGORIAS.map(el=>el.toLowerCase()).includes(categoryName.toLowerCase())){
+            if(CATEGORIAS.map(el=>el.name.toLowerCase()).includes(categoryName.toLowerCase())){
                 popAlert(`Categoria com nome: ${categoryName} já cadastrada`);
                 return false;
             }else{
-                CATEGORIAS.push(categoryName);
+                CATEGORIAS.push({name: categoryName, id: uniqueId('cat')});
+                clearFilterField(ID_PAGINAS[1]);
                 loadCategories([...CATEGORIAS]);
                 popAlert('Cadastrada com sucesso!',true);
                 return true;
@@ -190,11 +208,11 @@ const validateDate = (dateStr) => {
 }
 
 const newExpense = (nodeArray) => {
-    const newExp = {pago: false};
+    const newExp = {id: uniqueId('exp'),pago: false};
     for(let aNode of nodeArray){
         switch(aNode.name){
             case 'categoria':
-                if(CATEGORIAS.includes(aNode.value)){
+                if(CATEGORIAS.map(el=>el.name).includes(aNode.value)){
                     newExp.categoria = aNode.value
                 } else {
                     popAlert("Categoria não cadastrada!");
@@ -225,16 +243,25 @@ const newExpense = (nodeArray) => {
         }
     }    
     DESPESAS.push(newExp);
+    clearFilterField(ID_PAGINAS[0]);
     loadDespesas([...DESPESAS]);
     updateTotals();
     return true;
+}
+
+const deleteDespesa = (index) => {
+    popConfirm("Deseja apagar despesa? (essa ação não é reversivel!",()=>{
+        DESPESAS.splice(index,1);
+        clearFilterField(ID_PAGINAS[0]);
+        loadDespesas([...DESPESAS]);
+    },'Excluir');
 }
 
 const expenseStatus = (parent, button, control) => {
     parent.removeChild(button);
     control.pago = !control.pago;
     button = document.querySelector(`.templates ${control.pago ? 'div.btn-pago-wrapper' : 'div.btn-pendente-wrapper'}`).cloneNode(true);
-    button.addEventListener('click',()=>{
+    button.querySelector('button').addEventListener('click',()=>{
         expenseStatus(parent, button, control)
     })
     parent.appendChild(button);
@@ -265,13 +292,24 @@ const loadDespesas = (despesas) => {
             tRow.appendChild(valorTd);
 
             const statusTd = document.createElement('td');
-            let actionButton = document.querySelector(`.templates ${el.pago ? 'div.btn-pago-wrapper' : 'div.btn-pendente-wrapper'}`).cloneNode(true);
-            actionButton.addEventListener('click',()=>{
-                expenseStatus (statusTd, actionButton, el);
-            })
-            statusTd.appendChild(actionButton);
+            const divStatusCtrl = document.createElement('div');
+            statusTd.appendChild(divStatusCtrl);
             tRow.appendChild(statusTd);
 
+            const paymentStatus = document.createElement('div');
+            let actionButton = document.querySelector(`.templates ${el.pago ? 'div.btn-pago-wrapper' : 'div.btn-pendente-wrapper'}`).cloneNode(true);
+            actionButton.querySelector('button').addEventListener('click',()=>{
+                expenseStatus (paymentStatus, actionButton, el);
+            })
+            paymentStatus.appendChild(actionButton);
+            divStatusCtrl.appendChild(paymentStatus);
+    
+            let excludeButton = document.querySelector('.templates div.btn-delete-wrapper').cloneNode(true);
+            excludeButton.querySelector('button').addEventListener('click',()=>{
+                deleteDespesa(index);
+            })
+            divStatusCtrl.appendChild(excludeButton);
+            
             tbody.appendChild(tRow);
         });
     } else {
@@ -279,7 +317,7 @@ const loadDespesas = (despesas) => {
     }
 }
 
-const editCategory = (index)=>{
+const editCategory = (catId)=>{
     loadModal(
         {
             title: 'Editar Categoria',
@@ -287,47 +325,70 @@ const editCategory = (index)=>{
                 inputGen("categoria","Categoria",
                 {
                     placeholder: "Nome da Categoria",
-                    value: CATEGORIAS[index]
+                    value: CATEGORIAS.filter(el=>el.id === catId)[0].name
                 })
             ]
         },
         (nodeArray)=>{
             const categoryName = nodeArray[0].value;
-            if(CATEGORIAS.map(el=>el.toLowerCase()).includes(categoryName.toLowerCase())){
+            if(CATEGORIAS.map(el=>el.name.toLowerCase()).includes(categoryName.toLowerCase())){
                 popAlert(`Categoria com nome: ${categoryName} já cadastrada`);
                 return false;
             }else{
                 let changed = 0;
                 DESPESAS.forEach(el=>{
-                    if(el=>el.categoria === CATEGORIAS[index]){
+                    if(el=>el.categoria === CATEGORIAS.filter(el=>el.id === catId)[0].name){
                         changed++;
                         el.categoria = categoryName
                     }
                 })
-                CATEGORIAS[index] = categoryName;
+                let counter = 0;
+                for(let categoria of CATEGORIAS){
+                    if(categoria.id === catId){
+                        CATEGORIAS[counter].name = categoryName;
+                        break;
+                    }
+                    counter++;
+                }
+                clearFilterField(ID_PAGINAS[1]);
                 loadCategories([...CATEGORIAS]);
-                if(changed > 0) loadDespesas([...DESPESAS]);
+                if(changed > 0){
+                    clearFilterField(ID_PAGINAS[0]);
+                    loadDespesas([...DESPESAS]);
+                }
                 popAlert('Categoria editada com sucesso!',true);
                 return true;
             };
         })
 };
 
-const deleteCategory = (index)=>{
-    if(index === 0){
+const deleteCategory = (catId)=>{
+    if(catId === 1){
         popAlert("Não é possivel deletar a categoria principal!")
     }else{
         let changed = 0;
         popConfirm("Confirma apagar Categoria? (essa ação não é reversivel!)",()=>{
             DESPESAS.forEach(el=>{
-                if(el=>el.categoria === CATEGORIAS[index]){
+                if(el=>el.categoria === CATEGORIAS.filter(el=>el.id === catId)[0].name){
                     changed++;
-                    el.categoria = CATEGORIAS[0];
+                    el.categoria = CATEGORIAS.filter(el=>el.id === 1)[0].name;
                 }
             })
-            CATEGORIAS.splice(index,1);
+            
+            let counter = 0;
+            for(let categoria of CATEGORIAS){
+                if(categoria.id === catId){
+                    CATEGORIAS.splice(counter,1);
+                    break;
+                }
+                counter++;
+            }
+            clearFilterField(ID_PAGINAS[1]);
             loadCategories([...CATEGORIAS]);
-            if(changed > 0) loadDespesas([...DESPESAS]);
+            if(changed > 0){
+                clearFilterField(ID_PAGINAS[0]);
+                loadDespesas([...DESPESAS]);
+            }
         },'Exclusão');
     }
 };
@@ -338,15 +399,15 @@ const loadCategories = (categorias) => {
     tbody.innerHTML = '';
 
     if(categorias.length > 0){
-    categorias.forEach((el,index)=>{
+    categorias.forEach((el)=>{
             const tRow = document.createElement('tr');
             
             const idTd = document.createElement('td');
-            idTd.innerText = index + 1;
+            idTd.innerText = el.id;
             tRow.appendChild(idTd);
 
             const catNameTd = document.createElement('td');
-            catNameTd.innerText = el;
+            catNameTd.innerText = el.name;
             tRow.appendChild(catNameTd);
 
             
@@ -357,14 +418,14 @@ const loadCategories = (categorias) => {
 
             editBtn = document.querySelector('.templates div.btn-edit-wrapper').cloneNode(true);
             editBtn.addEventListener('click',()=>{
-                editCategory(index);
+                editCategory(el.id);
             });
             actionDiv.appendChild(editBtn);
 
-            if(index !== 0){
+            if(el.id !== 1){
                 deleteBtn = document.querySelector('.templates div.btn-delete-wrapper').cloneNode(true);
                 deleteBtn.addEventListener('click',()=>{
-                    deleteCategory(index);
+                    deleteCategory(el.id);
                 });
                 actionDiv.appendChild(deleteBtn)
             }
@@ -378,6 +439,11 @@ const loadCategories = (categorias) => {
     }
 }
 
+const clearFilterField = (containerId) => {
+        document.querySelector(`#${containerId} .caixa-filtro .limparFiltroWrapper`).classList.remove('show');
+        document.querySelector(`#${containerId} .caixa-filtro input`).value = "";
+}
+
 const filterActionAttach = (containerId,sourceArray,action) => {
     document.querySelector(`#${containerId} .caixa-filtro > button`).addEventListener('click',()=>{
         if(filterList(containerId,sourceArray,action)){
@@ -385,12 +451,10 @@ const filterActionAttach = (containerId,sourceArray,action) => {
         }else{
             popAlert("Digite um valor para filtrar!");
         };
-        
     });
     document.querySelector(`#${containerId} .caixa-filtro .limparFiltroWrapper button`).addEventListener('click',()=>{
         action([...sourceArray]);
-        document.querySelector(`#${containerId} .caixa-filtro .limparFiltroWrapper`).classList.remove('show');
-        document.querySelector(`#${containerId} .caixa-filtro input`).value = "";
+        clearFilterField(containerId);
     });
 }
 
