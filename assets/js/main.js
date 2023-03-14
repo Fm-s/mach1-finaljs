@@ -7,7 +7,6 @@ const CATEGORIAS = [{
 }];
 const DESPESAS = [];
 
-
 function uniqueId(tag){
     if(ID[tag]){
         ID[tag].last = ID[tag].next;
@@ -136,24 +135,28 @@ const filterList = (searchId, sourceArray, action) => {
         filterFn = (el) => {
             let match = 0;
             for(let key in el){
-                for(let word of words){
-                    if(el[key].toString().toLowerCase().includes(word)){
-                        match++
+                if(key !== "id"){
+                    for(let word of words){
+                        console.log('in',el[key].toString().toLowerCase(),word);
+                        if(el[key].toString().toLowerCase().includes(word)){
+                            match++
+                        }
                     }
                 }
             }
-            return match === words.length;
+            console.log(match, words.length);
+            return match >= words.length;
         }
     };
     if(searchId === 'categorias'){
         filterFn = (el) => {
             let match = 0;
             for(let word of words){
-                if(word === el.name.toLowerCase()){
+                if(el.name.toLowerCase().includes(word)){
                     match++;
                 }
             }
-            return match === words.length;
+            return match == words.length;
         }
     };
     action(sourceArray.filter(filterFn));
@@ -249,9 +252,16 @@ const newExpense = (nodeArray) => {
     return true;
 }
 
-const deleteDespesa = (index) => {
+const deleteDespesa = (idDespesa) => {
     popConfirm("Deseja apagar despesa? (essa ação não é reversivel!",()=>{
-        DESPESAS.splice(index,1);
+        let counter = 0;
+        for(let despesa of DESPESAS){
+            if(despesa.id === idDespesa){
+                DESPESAS.splice(counter,1);
+                break;     
+            }
+            counter++;
+        }
         clearFilterField(ID_PAGINAS[0]);
         loadDespesas([...DESPESAS]);
     },'Excluir');
@@ -306,7 +316,7 @@ const loadDespesas = (despesas) => {
     
             let excludeButton = document.querySelector('.templates div.btn-delete-wrapper').cloneNode(true);
             excludeButton.querySelector('button').addEventListener('click',()=>{
-                deleteDespesa(index);
+                deleteDespesa(el.id);
             })
             divStatusCtrl.appendChild(excludeButton);
             
