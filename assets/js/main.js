@@ -57,31 +57,43 @@ const updateTotals = () => {
 const valueChangeHandler = ({target}) => {
     target.value = numberFormatBR(target.value);
 }
-
-//Chat GPT
+//chatGPT
 const dateKeyDownHandler = (event) => {
-    let input = event.target;
-    let key = event.key;
-  
-    // Only format the input if the key pressed is a number, slash, or backspace
-    if (/\d|\//.test(key) || key === 'Backspace' || key == 'Delete') {
-      // Remove any non-numeric characters from the input
-      let cleanedInput = input.value.replace(/\D/g, '');
-  
-      // Format the input as "DD/MM/YYYY"
-      if (cleanedInput.length >= 2) {
-        cleanedInput = `${cleanedInput.slice(0, 2)}/${cleanedInput.slice(2)}`;
-      }
-      if (cleanedInput.length >= 5) {
-        cleanedInput = `${cleanedInput.slice(0, 5)}/${cleanedInput.slice(5)}`;
-      }
-  
-      // Set the value of the input to the formatted date
-      input.value = cleanedInput;
+    let dateInput = event.target;
+
+    if (
+        event.key.length === 1 &&
+        !/^\d$|\/$/.test(event.key) &&
+        !event.ctrlKey &&
+        !event.metaKey &&
+        !event.altKey &&
+        event.key !== 'Backspace' &&
+        event.key !== 'Delete' &&
+        event.key !== 'ArrowLeft' &&
+        event.key !== 'ArrowRight' &&
+        event.key !== 'Tab'
+    ) {
+        event.preventDefault();
     } else {
-      // Prevent any other keys from being typed in the input
-      event.preventDefault();
+        let dateString = dateInput.value.replace(/^(\d{2})(\d)/, '$1/$2');
+        dateString = dateString.replace(/^(\d{2})\/(\d{2})(\d+)/, '$1/$2/$3');
+        dateInput.value = dateString;
     }
+}
+//chatGPT
+const isValidDate = (dateString) => {
+    const regex = /^(\d{2})\/(\d{2})\/(\d{4})$/;
+    const match = regex.exec(dateString);
+    if (!match) return false;
+    const day = parseInt(match[1], 10);
+    const month = parseInt(match[2], 10) - 1; // Months are 0-based
+    const year = parseInt(match[3], 10);
+    const date = new Date(year, month, day);
+    return date.getFullYear() === year && date.getMonth() === month && date.getDate() === day;
+};
+
+const validateDate = (dateStr) => {    
+    return dateStr.length === 10 && isValidDate(dateStr);
 }
 
 const popAlert = (text,successes) => {
@@ -206,10 +218,6 @@ const newCategory = (nodeArray) => {
             };
 }
 
-const validateDate = (dateStr) => {
-    return dateStr.length === 10;
-}
-
 const newExpense = (nodeArray) => {
     const newExp = {id: uniqueId('exp'),pago: false};
     for(let aNode of nodeArray){
@@ -264,6 +272,7 @@ const deleteDespesa = (idDespesa) => {
         }
         clearFilterField(ID_PAGINAS[0]);
         loadDespesas([...DESPESAS]);
+        updateTotals();
     },'Excluir');
 }
 
