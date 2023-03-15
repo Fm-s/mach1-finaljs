@@ -1,5 +1,5 @@
 @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap');
-@import url('/assets/styles/templates.css');
+@import url('assets/styles/templates.css');
 
 :root{
     --header-height: 60px;
