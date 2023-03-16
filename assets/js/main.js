@@ -50,7 +50,7 @@ const updateTotals = () => {
         const today = new Date();
         return !el.pago && (today.getFullYear() > +splitDate[2] || 
             (today.getFullYear() === +splitDate[2] && today.getMonth()+1 > +splitDate[1] ||
-             (today.getFullYear() === +splitDate[2] && today.getMonth()+1 === +splitDate[1] && today.getDay() > splitDate[0])));
+             (today.getFullYear() === +splitDate[2] && today.getMonth()+1 === +splitDate[1] && today.getDate() > +splitDate[0])));
     }).length;
 }
 
