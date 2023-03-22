@@ -1,5 +1,5 @@
 @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap');
-@import url('/mach1-finaljs/assets/styles/templates.css');
+@import url('/assets/styles/templates.css');
 
 :root{
     --header-height: 60px;
@@ -84,7 +84,7 @@ main{
 }
 
 .totals-box.atrasadas {
-    border-bottom: 4px solid rgb(255, 184, 0)
+    border-bottom: 4px solid rgb(255, 184, 0);
 }
 
 .totals-box h4{
@@ -101,6 +101,18 @@ main{
     font-size: 36px;
     margin: 0;
     padding: 0;
+}
+
+.totals-box.pago p{
+ color: rgb(23, 141, 70);
+}
+
+.totals-box.apagar p{
+    color: red;;
+}
+
+.totals-box.atrasadas p{
+ color: rgb(255, 184, 0);
 }
 
 .lista-container{

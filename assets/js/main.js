@@ -1,13 +1,17 @@
 const ID_PAGINAS = ['despesas','categorias'];
 
-const ID = {};
-const CATEGORIAS = [{
-    name: 'Geral',
-    id: uniqueId('cat')  
-}];
-const DESPESAS = [];
+
+let CATEGORIAS;
+let DESPESAS;
 
 function uniqueId(tag){
+    let ID;
+    if(window.localStorage.getItem('uniqueId')){
+        ID = JSON.parse(window.localStorage.getItem('uniqueId'));
+    }else{
+        ID = {}
+    };
+    
     if(ID[tag]){
         ID[tag].last = ID[tag].next;
         ID[tag].next = ID[tag].next + 1;
@@ -16,7 +20,47 @@ function uniqueId(tag){
         ID[tag].last = 1;
         ID[tag].next = 2;
     }
+    window.localStorage.setItem('uniqueId',JSON.stringify(ID));
     return ID[tag].last;
+}
+
+const persitCategory = (categories) => {
+    window.localStorage.setItem('categorias',JSON.stringify(categories));
+}
+
+const loadCategory = () => {
+    if(window.localStorage.getItem('categorias')){
+        const cat = JSON.parse(window.localStorage.getItem('categorias'));
+        if(cat.length > 0){
+            return cat;
+        }else{
+            return [
+                {
+                    name: 'Geral',
+                    id: 0
+                }
+            ];
+        }
+    }else{
+        return [
+            {
+                name: 'Geral',
+                id: 0
+            }
+        ];
+    }
+}
+
+const persistExpense = (expenses) => {
+    window.localStorage.setItem('despesas',JSON.stringify(expenses));
+}
+
+const loadExpenses = () => {
+    if(window.localStorage.getItem('despesas')){
+        return JSON.parse(window.localStorage.getItem('despesas'));
+    }else{
+        return []
+    }
 }
 
 const stringToNumber = (value) => {
@@ -212,6 +256,7 @@ const newCategory = (nodeArray) => {
             }else{
                 CATEGORIAS.push({name: categoryName, id: uniqueId('cat')});
                 clearFilterField(ID_PAGINAS[1]);
+                persitCategory(CATEGORIAS);
                 loadCategories([...CATEGORIAS]);
                 popAlert('Cadastrada com sucesso!',true);
                 return true;
@@ -253,8 +298,9 @@ const newExpense = (nodeArray) => {
                 break;
         }
     }    
-    DESPESAS.push(newExp);
     clearFilterField(ID_PAGINAS[0]);
+    DESPESAS.push(newExp);
+    persistExpense(DESPESAS);
     loadDespesas([...DESPESAS]);
     updateTotals();
     return true;
@@ -271,6 +317,7 @@ const deleteDespesa = (idDespesa) => {
             counter++;
         }
         clearFilterField(ID_PAGINAS[0]);
+        persistExpense(DESPESAS);
         loadDespesas([...DESPESAS]);
         updateTotals();
     },'Excluir');
@@ -279,6 +326,7 @@ const deleteDespesa = (idDespesa) => {
 const expenseStatus = (parent, button, control) => {
     parent.removeChild(button);
     control.pago = !control.pago;
+    persistExpense(DESPESAS);
     button = document.querySelector(`.templates ${control.pago ? 'div.btn-pago-wrapper' : 'div.btn-pendente-wrapper'}`).cloneNode(true);
     button.querySelector('button').addEventListener('click',()=>{
         expenseStatus(parent, button, control)
@@ -373,6 +421,7 @@ const editCategory = (catId)=>{
                 loadCategories([...CATEGORIAS]);
                 if(changed > 0){
                     clearFilterField(ID_PAGINAS[0]);
+                    persistExpense(DESPESAS)
                     loadDespesas([...DESPESAS]);
                 }
                 popAlert('Categoria editada com sucesso!',true);
@@ -382,7 +431,7 @@ const editCategory = (catId)=>{
 };
 
 const deleteCategory = (catId)=>{
-    if(catId === 1){
+    if(catId === 0){
         popAlert("Não é possivel deletar a categoria principal!")
     }else{
         let changed = 0;
@@ -390,7 +439,7 @@ const deleteCategory = (catId)=>{
             DESPESAS.forEach(el=>{
                 if(el=>el.categoria === CATEGORIAS.filter(el=>el.id === catId)[0].name){
                     changed++;
-                    el.categoria = CATEGORIAS.filter(el=>el.id === 1)[0].name;
+                    el.categoria = CATEGORIAS.filter(el=>el.id === 0)[0].name;
                 }
             })
             
@@ -398,6 +447,7 @@ const deleteCategory = (catId)=>{
             for(let categoria of CATEGORIAS){
                 if(categoria.id === catId){
                     CATEGORIAS.splice(counter,1);
+                    persitCategory(CATEGORIAS);
                     break;
                 }
                 counter++;
@@ -406,6 +456,7 @@ const deleteCategory = (catId)=>{
             loadCategories([...CATEGORIAS]);
             if(changed > 0){
                 clearFilterField(ID_PAGINAS[0]);
+                persistExpense(DESPESAS)
                 loadDespesas([...DESPESAS]);
             }
         },'Exclusão');
@@ -441,7 +492,7 @@ const loadCategories = (categorias) => {
             });
             actionDiv.appendChild(editBtn);
 
-            if(el.id !== 1){
+            if(el.id !== 0){
                 deleteBtn = document.querySelector('.templates div.btn-delete-wrapper').cloneNode(true);
                 deleteBtn.addEventListener('click',()=>{
                     deleteCategory(el.id);
@@ -523,8 +574,10 @@ const pageLoad = () => {
         loadModal(modalDespesas(),newExpense)
     })
 
+    DESPESAS = loadExpenses()
     loadDespesas([...DESPESAS]);
 
+    CATEGORIAS = loadCategory();
     loadCategories([...CATEGORIAS]);
 
     filterActionAttach(ID_PAGINAS[0],DESPESAS,loadDespesas);
